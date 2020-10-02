@@ -20,11 +20,16 @@ export default {
       .then(response => {
         console.log(response)
         if (response.status === 200) {
-          context.commit('setUser', user)
-          return true
+          return response.json()
         } else {
-          return false
+          return null
         }
+      }).then(data => {
+        if (data && data.role === 'admin') {
+          context.commit('setUser', data)
+          return true
+        }
+        return false
       })
     },
   },
