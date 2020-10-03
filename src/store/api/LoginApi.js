@@ -1,5 +1,4 @@
 import API_BASE from './BaseApi'
-import Filter from './FilterApi'
 
 class LoginApi {
   login (user) {
@@ -16,7 +15,7 @@ class LoginApi {
       },
     })
 
-    return Filter.filter(response)
+    return response
   }
 }
 

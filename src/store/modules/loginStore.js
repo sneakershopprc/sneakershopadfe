@@ -10,8 +10,13 @@ export default {
   },
   mutations: {
     setUser (state, user) {
-      localStorage.setItem('user', JSON.stringify(user))
-      state.user = user
+      if (user === null) {
+        localStorage.removeItem('user')
+        state.user = null
+      } else {
+        localStorage.setItem('user', JSON.stringify(user))
+        state.user = user
+      }
     },
   },
   actions: {
@@ -31,6 +36,10 @@ export default {
         }
         return false
       })
+    },
+
+    logout (context) {
+      context.commit('setUser', null)
     },
   },
   namespaced: true,

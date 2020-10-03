@@ -3,6 +3,13 @@ import Router from 'vue-router'
 
 import Login from './views/Login.vue'
 import Index from './views/dashboard/Index'
+import Dashboard from './views/dashboard/Dashboard'
+import UserProfile from './views/dashboard/pages/UserProfile'
+import Notification from './views/dashboard/component/Notifications'
+import Icons from './views/dashboard/component/Icons'
+import Typography from './views/dashboard/component/Typography'
+import ListBrand from './views/manage-brand/ListBrand'
+import GoogleMaps from './views/dashboard/maps/GoogleMaps'
 
 Vue.use(Router)
 
@@ -16,6 +23,43 @@ const routes = [
     path: '/index',
     name: 'Index',
     component: Index,
+    children: [
+      {
+        name: 'Dashboard',
+        path: '',
+        component: Dashboard,
+      },
+      {
+        name: 'User Profile',
+        path: 'pages/user',
+        component: UserProfile,
+      },
+      {
+        name: 'Notification',
+        path: 'components/notifications',
+        component: Notification,
+      },
+      {
+        name: 'Icons',
+        path: 'components/icons',
+        component: Icons,
+      },
+      {
+        name: 'Typography',
+        path: 'components/typography',
+        component: Typography,
+      },
+      {
+        name: 'Manage Brand',
+        path: 'brand',
+        component: ListBrand,
+      },
+      {
+        name: 'Google Maps',
+        path: 'components/icons',
+        component: GoogleMaps,
+      },
+    ],
   },
 ]
 
@@ -23,9 +67,11 @@ const router = new Router({ routes })
 
 router.beforeEach((to, from, next) => {
   const publicPages = ['Login']
-  const authPages = ['Index']
+  const authPages = ['Index', 'Dashboard', 'User Profile', 'Notification', 'Icons', 'Typography', 'Manage Brand', 'Google Maps']
   const authRequired = !publicPages.includes(to.name)
   const user = JSON.parse(localStorage.getItem('user'))
+
+  console.log('router name ', to.name)
   console.log('this.user', user)
 
   // trying to access a restricted page + not logged in
