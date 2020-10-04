@@ -12,6 +12,19 @@ class BrandApi {
 
     return response
   }
+
+  updateBrand (brand) {
+    const url = API_BASE + '/brands/' + brand.brandId
+
+    return fetch(url, {
+      method: 'PUT',
+      crossDomain: true,
+      body: JSON.stringify(brand),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+  }
 }
 
 export default new BrandApi()

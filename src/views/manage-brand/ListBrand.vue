@@ -33,44 +33,54 @@
                   Add New Brand
                 </v-btn>
               </template>
-              <v-card>
+              <v-card :loading="isDialogLoaing">
                 <v-card-title>
                   <span class="headline">{{ formTitle }}</span>
                 </v-card-title>
 
                 <v-card-text>
                   <v-container>
+                    <!-- Name -->
                     <v-row>
-                      <v-col
-                        cols="12"
-                        sm="6"
-                        md="4"
+                      <v-text-field
+                        v-model="editedBrand.brandNm"
+                        label="Name"
+                      />
+                    </v-row>
+                    <!-- Description -->
+                    <v-row>
+                      <v-text-field
+                        v-model="editedBrand.description"
+                        label="Description"
+                      />
+                    </v-row>
+                    <!-- Image -->
+                    <v-row
+                      style="height: 120px; text-align: center"
+                      :class="'justify-center align-center'"
+                    >
+                      <img
+                        v-if="!isUploading && editedBrand.photo"
+                        height="100"
+                        :src="editedBrand.photo"
                       >
-                        <v-text-field
-                          v-model="editedBrand.brandNm"
-                          label="Name"
-                        />
-                      </v-col>
-                      <v-col
-                        cols="12"
-                        sm="6"
-                        md="4"
-                      >
-                        <v-text-field
-                          v-model="editedBrand.photo"
-                          label="Image"
-                        />
-                      </v-col>
-                      <v-col
-                        cols="12"
-                        sm="6"
-                        md="4"
-                      >
-                        <v-text-field
-                          v-model="editedBrand.description"
-                          label="Name"
-                        />
-                      </v-col>
+                      <v-progress-circular
+                        v-if="isUploading"
+                        indeterminate
+                        color="primary"
+                      />
+                    </v-row>
+                    <v-row>
+                      <v-file-input
+                        v-model="imagePreview"
+                        :rules="rules"
+                        accept="image/*"
+                        placeholder="Pick an image"
+                        prepend-icon="mdi-camera"
+                        label="Image"
+                        @change="uploadImg"
+                        @click:clear="cancelImg"
+                      />
                     </v-row>
                   </v-container>
                 </v-card-text>
@@ -151,15 +161,40 @@
         </template>
       </v-data-table>
     </base-material-card>
+
+    <v-snackbar
+      v-model="snackbarShow"
+      :timeout="5000"
+    >
+      {{ message }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn
+          color="pink"
+          text
+          v-bind="attrs"
+          @click="snackbarShow = false"
+        >
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-container>
 </template>
 
 <script>
-  import { mapActions, mapGetters } from 'vuex'
+  import firebase from 'firebase'
+  import { mapActions, mapGetters, mapMutations } from 'vuex'
 
   export default {
     data: () => ({
+      rules: [
+        value => !value || value.size < 20000000 || 'Image size should be less than 20 MB!',
+      ],
+      imagePreview: null,
       isLoading: false,
+      isDialogLoaing: false,
+      isUploading: false,
       dialog: false,
       dialogDelete: false,
       headers: [
@@ -182,6 +217,9 @@
         photo: 0,
         description: 0,
       },
+      imgTmp: '',
+      snackbarShow: false,
+      message: '',
     }),
 
     computed: {
@@ -205,8 +243,9 @@
     },
 
     methods: {
-      ...mapActions('brandStore', ['fetchListBrands']),
+      ...mapActions('brandStore', ['fetchListBrands', 'updateBrand']),
       ...mapActions('loginStore', ['logout']),
+      ...mapMutations('brandStore', ['setBrand']),
 
       initialize () {
         this.isLoading = true
@@ -221,8 +260,10 @@
       },
 
       editItem (item) {
+        this.imagePreview = null
         this.editedIndex = this.listBrands.indexOf(item)
         this.editedBrand = Object.assign({}, item)
+        this.imgTmp = this.editedBrand.photo
         this.dialog = true
       },
 
@@ -238,11 +279,13 @@
       },
 
       close () {
-        this.dialog = false
-        this.$nextTick(() => {
-          this.editedBrand = Object.assign({}, this.defaultBrand)
-          this.editedIndex = -1
-        })
+        if (!this.isDialogLoaing) {
+          this.dialog = false
+          this.$nextTick(() => {
+            this.editedBrand = Object.assign({}, this.defaultBrand)
+            this.editedIndex = -1
+          })
+        }
       },
 
       closeDelete () {
@@ -255,11 +298,60 @@
 
       save () {
         if (this.editedIndex > -1) {
-          Object.assign(this.listBrands[this.editedIndex], this.editedBrand)
+          if (!this.isUploading) {
+            this.isDialogLoaing = true
+            this.setBrand(this.editedBrand)
+            this.updateBrand()
+              .then(status => {
+                if (status === 200) {
+                  this.message = 'Update success'
+                  this.snackbarShow = true
+                  this.isDialogLoaing = false
+                  Object.assign(this.listBrands[this.editedIndex], this.editedBrand)
+                  this.close()
+                } else if (status === 401 || status === 403) {
+                  this.logout()
+                } else {
+                  this.message = 'Error'
+                  this.snackbarShow = true
+                }
+              })
+          }
         } else {
           this.listBrands.push(this.editedBrand)
         }
-        this.close()
+      },
+
+      uploadImg () {
+        if (this.imagePreview) {
+          this.isUploading = true
+          var extend = this.imagePreview.name.substr(this.imagePreview.name.lastIndexOf('.'))
+          var fileName = this.editedBrand.brandId + extend
+
+          const storageRef = firebase.storage().ref(`${fileName}`).put(this.imagePreview)
+
+          storageRef.on('state_changed', snapshot => {
+                          this.uploadValue = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+                        },
+                        error => {
+                          console.log(error.message)
+                          this.isUploading = false
+                        },
+                        () => {
+                          this.uploadValue = 100
+                          storageRef.snapshot.ref.getDownloadURL().then((url) => {
+                            this.editedBrand.photo = url
+                            console.log(this.editedBrand.photo)
+                            this.isUploading = false
+                          })
+                        },
+          )
+        }
+      },
+
+      cancelImg () {
+        this.editedBrand.photo = this.imgTmp
+        this.isUploading = false
       },
     },
   }

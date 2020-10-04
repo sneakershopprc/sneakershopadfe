@@ -40,6 +40,13 @@ export default {
           return response.status
         })
     },
+
+    updateBrand (context) {
+      return BrandApi.updateBrand(context.state.brand)
+        .then(response => {
+          return response.status
+        })
+    },
   },
   namespaced: true,
 }
