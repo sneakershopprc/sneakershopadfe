@@ -6,12 +6,12 @@
   >
     <base-material-card
       icon="mdi-clipboard-text"
-      title="Manage Brand"
+      title="Manage Product"
       class="px-5 py-3"
     >
       <v-data-table
         :headers="headers"
-        :items="listBrands"
+        :items="listProducts"
         :loading="isLoading"
         class="elevation-1"
       >
@@ -30,7 +30,7 @@
                   v-bind="attrs"
                   v-on="on"
                 >
-                  Add New Brand
+                  Add New Product
                 </v-btn>
               </template>
               <v-card :loading="isDialogLoaing">
@@ -153,11 +153,11 @@
           <img
             style="margin: 15px 0"
             height="100"
-            :src="item.photo"
+            :src="item.photoList[0]"
           >
         </template>
         <template v-slot:item.index="{ item }">
-          {{ listBrands.indexOf(item) + 1 }}
+          {{ listProducts.indexOf(item) + 1 }}
         </template>
       </v-data-table>
     </base-material-card>
@@ -200,8 +200,10 @@
       headers: [
         { text: 'No.', value: 'index' },
         { text: 'Image', value: 'photo' },
-        { text: 'Name', value: 'brandNm' },
-        { text: 'Description', value: 'description' },
+        { text: 'Name', value: 'productNm' },
+        { text: 'Brand', value: 'brandNm' },
+        { text: 'Price', value: 'price' },
+        { text: 'Discount', value: 'discount' },
         { text: 'Actions', value: 'actions', sortable: false },
       ],
       editedIndex: -1,
@@ -223,9 +225,9 @@
     }),
 
     computed: {
-      ...mapGetters('brandStore', ['listBrands']),
+      ...mapGetters('productStore', ['listProducts']),
       formTitle () {
-        return this.editedIndex === -1 ? 'New Brand' : 'Edit Brand'
+        return this.editedIndex === -1 ? 'New Product' : 'Edit Product'
       },
     },
 
@@ -243,14 +245,14 @@
     },
 
     methods: {
-      ...mapActions('brandStore', ['fetchListBrands', 'updateBrand', 'addBrand']),
+      ...mapActions('productStore', ['fetchListProducts']),
       ...mapActions('loginStore', ['logout']),
-      ...mapMutations('brandStore', ['setBrand']),
+      ...mapMutations('productStore', ['setProduct']),
 
       initialize () {
         this.isLoading = true
 
-        this.fetchListBrands().then((status) => {
+        this.fetchListProducts().then((status) => {
           if (status === 401 || status === 403) {
             this.logout()
             this.$router.push('/')
@@ -261,20 +263,20 @@
 
       editItem (item) {
         this.imagePreview = null
-        this.editedIndex = this.listBrands.indexOf(item)
+        this.editedIndex = this.listProducts.indexOf(item)
         this.editedBrand = Object.assign({}, item)
         this.imgTmp = this.editedBrand.photo
         this.dialog = true
       },
 
       deleteItem (item) {
-        this.editedIndex = this.listBrands.indexOf(item)
+        this.editedIndex = this.listProducts.indexOf(item)
         this.editedBrand = Object.assign({}, item)
         this.dialogDelete = true
       },
 
       deleteItemConfirm () {
-        this.listBrands.splice(this.editedIndex, 1)
+        this.listProducts.splice(this.editedIndex, 1)
         this.closeDelete()
       },
 
@@ -307,7 +309,7 @@
                   this.message = 'Update success'
                   this.snackbarShow = true
                   this.isDialogLoaing = false
-                  Object.assign(this.listBrands[this.editedIndex], this.editedBrand)
+                  Object.assign(this.listProducts[this.editedIndex], this.editedBrand)
                   this.close()
                 } else if (status === 401 || status === 403) {
                   this.logout()

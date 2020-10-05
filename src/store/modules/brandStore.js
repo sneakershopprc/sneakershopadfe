@@ -34,7 +34,8 @@ export default {
           if (response.status === 200) {
             response.json()
               .then(data => {
-                context.commit('setListBrand', data)
+                console.log('dataaaa ', data)
+                context.commit('setListBrand', data.data)
               })
           }
           return response.status
@@ -43,6 +44,13 @@ export default {
 
     updateBrand (context) {
       return BrandApi.updateBrand(context.state.brand)
+        .then(response => {
+          return response.status
+        })
+    },
+
+    addBrand (context) {
+      return BrandApi.add(context.state.brand)
         .then(response => {
           return response.status
         })

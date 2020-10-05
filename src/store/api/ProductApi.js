@@ -2,7 +2,7 @@ import API_BASE from './BaseApi'
 
 class BrandApi {
   getList () {
-    const url = API_BASE + '/brands'
+    const url = API_BASE + '/products'
 
     var response = fetch(url, {
       method: 'GET',
@@ -13,7 +13,19 @@ class BrandApi {
     return response
   }
 
-  updateBrand (brand) {
+  getById (id) {
+    const url = API_BASE + '/products/' + id
+
+    var response = fetch(url, {
+      method: 'GET',
+      withCredentials: true,
+      crossDomain: true,
+    })
+
+    return response
+  }
+
+  /* updateBrand (brand) {
     const url = API_BASE + '/brands/' + brand.brandId
 
     return fetch(url, {
@@ -37,7 +49,7 @@ class BrandApi {
         'Content-Type': 'application/json',
       },
     })
-  }
+  } */
 }
 
 export default new BrandApi()

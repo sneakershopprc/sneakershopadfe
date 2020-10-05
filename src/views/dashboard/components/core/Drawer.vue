@@ -122,6 +122,11 @@
           to: '/index/brand',
         },
         {
+          title: 'Manage Product',
+          icon: 'mdi-map-marker',
+          to: '/index/product',
+        },
+        {
           title: 'typography',
           icon: 'mdi-format-font',
           to: '/index/components/typography',
@@ -130,11 +135,6 @@
           title: 'icons',
           icon: 'mdi-chart-bubble',
           to: '/index/components/icons',
-        },
-        {
-          title: 'google',
-          icon: 'mdi-map-marker',
-          to: '/index/maps/google-maps',
         },
         {
           title: 'notifications',

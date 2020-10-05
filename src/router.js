@@ -9,7 +9,8 @@ import Notification from './views/dashboard/component/Notifications'
 import Icons from './views/dashboard/component/Icons'
 import Typography from './views/dashboard/component/Typography'
 import ListBrand from './views/manage-brand/ListBrand'
-import GoogleMaps from './views/dashboard/maps/GoogleMaps'
+import ListProduct from './views/manage-product/ListProduct'
+import ProductDetail from './views/manage-product/ProductDetail'
 
 Vue.use(Router)
 
@@ -55,9 +56,15 @@ const routes = [
         component: ListBrand,
       },
       {
-        name: 'Google Maps',
-        path: 'components/icons',
-        component: GoogleMaps,
+        name: 'Manage Product',
+        path: 'product',
+        component: ListProduct,
+      },
+      {
+        name: 'Product Detail',
+        path: 'product/:productId',
+        component: ProductDetail,
+        props: true,
       },
     ],
   },
@@ -67,7 +74,7 @@ const router = new Router({ routes })
 
 router.beforeEach((to, from, next) => {
   const publicPages = ['Login']
-  const authPages = ['Index', 'Dashboard', 'User Profile', 'Notification', 'Icons', 'Typography', 'Manage Brand', 'Google Maps']
+  const authPages = ['Index', 'Dashboard', 'User Profile', 'Notification', 'Icons', 'Typography', 'Manage Brand', 'Manage Product', 'Product Detail']
   const authRequired = !publicPages.includes(to.name)
   const user = JSON.parse(localStorage.getItem('user'))
 
