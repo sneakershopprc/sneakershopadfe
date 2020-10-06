@@ -12,21 +12,24 @@
         <base-material-card>
           <template v-slot:heading>
             <div
-              v-if="$route.params.productId != 0"
+              v-if="productId != 0"
               class="display-2 font-weight-light"
             >
-              Edit Product #{{ $route.params.productId }}
+              Edit Product #{{ productId }}
             </div>
 
             <div
-              v-if="$route.params.productId == 0"
+              v-if="productId == 0"
               class="display-2 font-weight-light"
             >
               Add New Product
             </div>
           </template>
 
-          <v-form>
+          <v-form
+            ref="form"
+            lazy-validation
+          >
             <v-container class="py-0">
               <v-row>
                 <v-col
@@ -35,6 +38,7 @@
                 >
                   <v-text-field
                     v-model="product.productNm"
+                    :rules="[rules.required]"
                     class="purple-input"
                     label="Product Name"
                   />
@@ -44,10 +48,13 @@
                   cols="12"
                   md="4"
                 >
-                  <v-text-field
+                  <v-select
                     v-model="product.color"
+                    :rules="[rules.required]"
+                    :items="listColor"
+                    item-text="value"
+                    item-value="id"
                     label="Color"
-                    class="purple-input"
                   />
                 </v-col>
 
@@ -57,7 +64,11 @@
                 >
                   <v-text-field
                     v-model="product.discount"
-                    label="Discount"
+                    min="0"
+                    max="100"
+                    :rules="[rules.minimum0, rules.maximum100]"
+                    type="number"
+                    label="Discount%"
                     class="purple-input"
                   />
                 </v-col>
@@ -80,16 +91,19 @@
                 >
                   <v-select
                     v-model="product.brandId"
+                    :rules="[rules.required]"
                     :items="listBrands"
                     item-text="brandNm"
                     item-value="brandId"
                     label="Brand"
-                    @change="brandSelect"
                   />
                 </v-col>
               </v-row>
               <v-row>
-                <v-col cols="12">
+                <v-col
+                  cols="2"
+                  class="text-center"
+                >
                   <v-file-input
                     v-model="imageFile"
                     hide-input
@@ -97,6 +111,9 @@
                     truncate-length="4"
                     @change="uploadImg"
                   />
+                  <div style="margin-top: -26px">
+                    Add Image
+                  </div>
                 </v-col>
               </v-row>
               <v-row>
@@ -108,17 +125,19 @@
                   <v-row>
                     <v-col cols="12">
                       <img
-                        width="100"
+                        style="width: 100%"
                         :src="img.url"
                       >
                     </v-col>
                   </v-row>
                   <v-row>
-                    <v-col cols="12">
+                    <v-col
+                      class="text-center"
+                      cols="12"
+                    >
                       <v-btn
                         style="width: 30px; height: 30px"
-                        dark
-                        color="primary"
+                        depressed
                         @click="removeImg(index)"
                       >
                         Remove
@@ -136,8 +155,10 @@
                   cols="4"
                 >
                   <v-text-field
-                    v-model="detail.quantity"
-                    label="Quantity"
+                    v-model="detail.size"
+                    type="number"
+                    :rules="[rules.minimum0, rules.duplicateSize]"
+                    label="Size"
                     class="purple-input"
                   />
                 </v-col>
@@ -146,6 +167,8 @@
                 >
                   <v-text-field
                     v-model="detail.price"
+                    type="number"
+                    :rules="[rules.minimum0]"
                     label="Price"
                     class="purple-input"
                   />
@@ -154,8 +177,10 @@
                   cols="3"
                 >
                   <v-text-field
-                    v-model="detail.size"
-                    label="Size"
+                    v-model="detail.quantity"
+                    type="number"
+                    :rules="[rules.minimum0]"
+                    label="Quantity"
                     class="purple-input"
                   />
                 </v-col>
@@ -163,9 +188,9 @@
                   cols="1"
                 >
                   <v-btn
+                    v-if="!detail.origin"
                     style="width: 30px; height: 30px"
-                    dark
-                    color="primary"
+                    depressed
                     @click="clearDetail(index)"
                   >
                     Clear
@@ -194,9 +219,10 @@
                   <v-btn
                     color="success"
                     class="mr-0"
+                    @click="action"
                   >
-                    <span v-if="$route.params.productId != 0">Update Product</span>
-                    <span v-if="$route.params.productId == 0">Add Product</span>
+                    <span v-if="productId != 0">Update Product</span>
+                    <span v-if="productId == 0">Add Product</span>
                   </v-btn>
                 </v-col>
               </v-row>
@@ -205,6 +231,23 @@
         </base-material-card>
       </v-col>
     </v-row>
+    <v-snackbar
+      v-model="snackbarShow"
+      :timeout="5000"
+    >
+      {{ message }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn
+          color="pink"
+          text
+          v-bind="attrs"
+          @click="snackbarShow = false"
+        >
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-container>
 </template>
 
@@ -217,31 +260,80 @@
     name: 'ProductDetail',
     data () {
       return {
+        message: '',
+        snackbarShow: false,
+        isLoading: false,
         productId: '',
-        listDetail: [],
         defaultDetail: {
           quantity: 0,
           price: 0,
           size: 0,
+          origin: false,
         },
-        listPhoto: [],
         imageFile: {},
+        listColor: [
+          { id: 'White', value: 'White' },
+          { id: 'Black', value: 'Black' },
+          { id: 'Grey', value: 'Grey' },
+          { id: 'Red', value: 'Red' },
+          { id: 'Orange', value: 'Orange' },
+          { id: 'Yellow', value: 'Yellow' },
+          { id: 'Green', value: 'Green' },
+          { id: 'Blue', value: 'Blue' },
+          { id: 'Brown', value: 'Brown' },
+        ],
+        rules: {
+          required: value => !!value || 'Required.',
+          maximum100: value => value <= 100 || 'Maximum 100',
+          minimum0: value => value >= 0 || 'Minimum 0',
+          duplicateSize: value => this.listDetail.filter(e => e.size === value).length === 1 || 'Duplicate ',
+        },
       }
     },
     computed: {
       ...mapGetters('brandStore', ['listBrands']),
-      ...mapGetters('productStore', ['product']),
+      ...mapGetters('productStore', ['product', 'listPhoto', 'listDetail']),
     },
     mounted () {
       this.productId = this.$route.params.productId
-      this.fetchListBrands()
-      if (this.productId !== 0) {
-        this.fetchProduct(this.productId)
-      }
+      this.fetchData()
     },
     methods: {
       ...mapActions('brandStore', ['fetchListBrands']),
-      ...mapActions('productStore', ['fetchProduct']),
+      ...mapActions('productStore', ['fetchProduct', 'updateDetail',
+                                     'updateProduct', 'insertProduct',
+                                     'insertDetail', 'reset']),
+      ...mapActions('loginStore', ['logout']),
+
+      fetchData () {
+        this.isLoading = true
+        console.log('proID ', this.productId)
+        this.fetchListBrands()
+          .then(status => {
+            if (status === 200) {
+              if (this.productId !== '0') {
+                this.fetchProduct(this.productId)
+                  .then(status => {
+                    if (status === 200) {
+                      this.isLoading = false
+                    } else if (status === 401 || status === 403) {
+                      this.logout()
+                    } else {
+                      this.message = 'Get data fail'
+                      this.snackbarShow = true
+                    }
+                  })
+              } else {
+                this.reset()
+              }
+            } else if (status === 401 || status === 403) {
+              this.logout()
+            } else {
+              this.message = 'Get data fail'
+              this.snackbarShow = true
+            }
+          })
+      },
 
       addNewDetail () {
         this.listDetail.push(Object.assign({}, this.defaultDetail))
@@ -251,16 +343,13 @@
         this.listDetail.splice(index, 1)
       },
 
-      brandSelect () {
-        console.log('brandddd ', this.currentBrand)
-      },
-
       removeImg (index) {
         this.listPhoto.splice(index, 1)
       },
 
       uploadImg () {
         if (this.imageFile) {
+          this.isLoading = true
           var fileName = moment() + this.imageFile.name
 
           const storageRef = firebase.storage().ref(`${fileName}`).put(this.imageFile)
@@ -270,14 +359,76 @@
                         },
                         error => {
                           console.log(error.message)
+                          this.message = 'Upload image failed'
+                          this.snackbarShow = true
+                          this.isLoading = false
                         },
                         () => {
                           this.uploadValue = 100
                           storageRef.snapshot.ref.getDownloadURL().then((url) => {
                             this.listPhoto.push({ url: url })
+                            this.isLoading = false
                           })
                         },
           )
+        }
+      },
+
+      validateForm () {
+        var flag = true
+
+        if (this.listPhoto.length === 0) {
+          this.message = 'Atleast 1 image'
+          this.snackbarShow = true
+          flag = false
+        } else if (this.listDetail.length === 0) {
+          this.message = 'Atleast 1 detail'
+          this.snackbarShow = true
+          flag = false
+        }
+
+        return flag
+      },
+
+      action () {
+        console.log('actionnn', this.$refs.form.validate())
+        if (this.$refs.form.validate() && this.validateForm()) {
+          this.isLoading = true
+          if (this.productId !== '0') {
+            this.updateDetail()
+              .then(() => {
+                this.updateProduct()
+                  .then(status => {
+                    if (status === 200) {
+                      this.message = 'Update success'
+                      this.snackbarShow = true
+                      this.fetchData()
+                    } else if (status === 401 || status === 403) {
+                      this.logout()
+                    } else {
+                      this.message = 'Update fail'
+                      this.snackbarShow = true
+                    }
+                    this.isLoading = false
+                  })
+              })
+          } else {
+            this.insertProduct()
+              .then(status => {
+                if (status === 201) {
+                  this.productId = this.product.productId
+                  console.log('idddd ', this.productId)
+                  this.insertDetail()
+                    .then(() => {
+                      this.isLoading = false
+                      this.fetchData()
+                      history.pushState({}, null, this.product.productId)
+                      this.message = 'Insert success'
+                      this.snackbarShow = true
+                    })
+                }
+              })
+          }
         }
       },
     },

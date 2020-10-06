@@ -19,7 +19,7 @@
           <v-toolbar flat>
             <v-spacer />
             <v-dialog
-              v-model="dialog"
+              v-model="dialogDelete"
               max-width="500px"
             >
               <template v-slot:activator="{ on, attrs }">
@@ -28,89 +28,14 @@
                   dark
                   class="mb-2"
                   v-bind="attrs"
-                  v-on="on"
+                  @click="addNewProduct"
                 >
                   Add New Product
                 </v-btn>
               </template>
-              <v-card :loading="isDialogLoaing">
-                <v-card-title>
-                  <span class="headline">{{ formTitle }}</span>
-                </v-card-title>
-
-                <v-card-text>
-                  <v-container>
-                    <!-- Name -->
-                    <v-row>
-                      <v-text-field
-                        v-model="editedBrand.brandNm"
-                        label="Name"
-                      />
-                    </v-row>
-                    <!-- Description -->
-                    <v-row>
-                      <v-text-field
-                        v-model="editedBrand.description"
-                        label="Description"
-                      />
-                    </v-row>
-                    <!-- Image -->
-                    <v-row
-                      style="height: 120px; text-align: center"
-                      :class="'justify-center align-center'"
-                    >
-                      <img
-                        v-if="!isUploading && editedBrand.photo"
-                        height="100"
-                        :src="editedBrand.photo"
-                      >
-                      <v-progress-circular
-                        v-if="isUploading"
-                        indeterminate
-                        color="primary"
-                      />
-                    </v-row>
-                    <v-row>
-                      <v-file-input
-                        v-model="imagePreview"
-                        :rules="rules"
-                        accept="image/*"
-                        placeholder="Pick an image"
-                        prepend-icon="mdi-camera"
-                        label="Image"
-                        @change="uploadImg"
-                        @click:clear="cancelImg"
-                      />
-                    </v-row>
-                  </v-container>
-                </v-card-text>
-
-                <v-card-actions>
-                  <v-spacer />
-                  <v-btn
-                    color="blue darken-1"
-                    text
-                    @click="close"
-                  >
-                    Cancel
-                  </v-btn>
-                  <v-btn
-                    color="blue darken-1"
-                    text
-                    @click="save"
-                  >
-                    Save
-                  </v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-            <v-dialog
-              v-model="dialogDelete"
-              max-width="500px"
-            >
               <v-card>
                 <v-card-title class="headline">
-                  Are you sure you want to delete this item?
+                  Are you sure you want to delete product "{{ selectProduct.productNm }}" ?
                 </v-card-title>
                 <v-card-actions>
                   <v-spacer />
@@ -207,18 +132,7 @@
         { text: 'Actions', value: 'actions', sortable: false },
       ],
       editedIndex: -1,
-      editedBrand: {
-        brandId: '',
-        brandNm: '',
-        photo: '',
-        description: '',
-      },
-      defaultBrand: {
-        brandId: '',
-        brandNm: '',
-        photo: '',
-        description: '',
-      },
+      selectProduct: {},
       imgTmp: '',
       snackbarShow: false,
       message: '',
@@ -245,7 +159,7 @@
     },
 
     methods: {
-      ...mapActions('productStore', ['fetchListProducts']),
+      ...mapActions('productStore', ['fetchListProducts', 'deleteProduct']),
       ...mapActions('loginStore', ['logout']),
       ...mapMutations('productStore', ['setProduct']),
 
@@ -262,84 +176,31 @@
       },
 
       editItem (item) {
-        this.imagePreview = null
-        this.editedIndex = this.listProducts.indexOf(item)
-        this.editedBrand = Object.assign({}, item)
-        this.imgTmp = this.editedBrand.photo
-        this.dialog = true
+        this.$router.push('/index/product/' + item.productId)
+      },
+
+      addNewProduct () {
+        this.$router.push('/index/product/0')
       },
 
       deleteItem (item) {
         this.editedIndex = this.listProducts.indexOf(item)
-        this.editedBrand = Object.assign({}, item)
+        this.selectProduct = Object.assign({}, item)
         this.dialogDelete = true
       },
 
       deleteItemConfirm () {
         this.listProducts.splice(this.editedIndex, 1)
+        this.deleteProduct(this.selectProduct.productId)
         this.closeDelete()
-      },
-
-      close () {
-        if (!this.isDialogLoaing) {
-          this.dialog = false
-          this.$nextTick(() => {
-            this.editedBrand = Object.assign({}, this.defaultBrand)
-            this.editedIndex = -1
-          })
-        }
       },
 
       closeDelete () {
         this.dialogDelete = false
         this.$nextTick(() => {
-          this.editedBrand = Object.assign({}, this.defaultBrand)
+          this.selectProduct = Object.assign({}, {})
           this.editedIndex = -1
         })
-      },
-
-      save () {
-        if (this.editedIndex > -1) {
-          if (!this.isUploading) {
-            this.isDialogLoaing = true
-            this.setBrand(this.editedBrand)
-            this.updateBrand()
-              .then(status => {
-                if (status === 200) {
-                  this.message = 'Update success'
-                  this.snackbarShow = true
-                  this.isDialogLoaing = false
-                  Object.assign(this.listProducts[this.editedIndex], this.editedBrand)
-                  this.close()
-                } else if (status === 401 || status === 403) {
-                  this.logout()
-                } else {
-                  this.message = 'Error'
-                  this.snackbarShow = true
-                }
-              })
-          }
-        } else {
-          if (!this.isUploading) {
-            this.isDialogLoaing = true
-            this.setBrand(this.editedBrand)
-            this.addBrand()
-              .then(status => {
-                if (status === 201) {
-                  this.message = 'Update success'
-                  this.snackbarShow = true
-                  this.isDialogLoaing = false
-                  this.initialize()
-                  this.close()
-                } else if (status === 401 || status === 403) {
-                  this.logout()
-                } else {
-                  this.message = 'Error'
-                  this.snackbarShow = true
-                }
-              })
-          }
-        }
       },
 
       uploadImg () {
