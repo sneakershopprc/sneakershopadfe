@@ -92,6 +92,7 @@
   // Utilities
   import {
     mapState,
+    mapMutations,
   } from 'vuex'
 
   export default {
@@ -109,49 +110,35 @@
         {
           icon: 'mdi-view-dashboard',
           title: 'dashboard',
-          to: '/index',
-        },
-        {
-          icon: 'mdi-account',
-          title: 'user',
-          to: '/index/pages/user',
+          to: '/',
         },
         {
           title: 'Manage Brand',
           icon: 'mdi-clipboard-outline',
-          to: '/index/brand',
+          to: '/brand',
         },
         {
           title: 'Manage Product',
           icon: 'mdi-map-marker',
-          to: '/index/product',
+          to: '/product',
         },
         {
-          title: 'typography',
+          title: 'Manage Order',
           icon: 'mdi-format-font',
-          to: '/index/components/typography',
-        },
-        {
-          title: 'icons',
-          icon: 'mdi-chart-bubble',
-          to: '/index/components/icons',
-        },
-        {
-          title: 'notifications',
-          icon: 'mdi-bell',
-          to: '/index/components/notifications',
+          to: '/order',
         },
       ],
+      ...mapState('templateStore', ['drawer']),
     }),
 
     computed: {
-      ...mapState(['barColor', 'barImage']),
+      ...mapState('templateStore', ['barColor', 'barImage']),
       drawer: {
         get () {
-          return this.$store.state.drawer
+          return this.drawer
         },
         set (val) {
-          this.$store.commit('SET_DRAWER', val)
+          this.setDrawer(val)
         },
       },
       computedItems () {
@@ -166,6 +153,8 @@
     },
 
     methods: {
+      ...mapMutations('templateStore', ['setDrawer']),
+
       mapItem (item) {
         return {
           ...item,

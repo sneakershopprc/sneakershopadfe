@@ -253,7 +253,7 @@
         this.fetchListBrands().then((status) => {
           if (status === 401 || status === 403) {
             this.logout()
-            this.$router.push('/')
+            this.$router.push('/login')
           }
           this.isLoading = false
         })
@@ -311,6 +311,7 @@
                   this.close()
                 } else if (status === 401 || status === 403) {
                   this.logout()
+                  this.$router.push('/login')
                 } else {
                   this.message = 'Error'
                   this.snackbarShow = true
@@ -331,6 +332,7 @@
                   this.close()
                 } else if (status === 401 || status === 403) {
                   this.logout()
+                  this.$router.push('/login')
                 } else {
                   this.message = 'Error'
                   this.snackbarShow = true

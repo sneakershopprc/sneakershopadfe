@@ -4,24 +4,22 @@ import Router from 'vue-router'
 import Login from './views/Login.vue'
 import Index from './views/dashboard/Index'
 import Dashboard from './views/dashboard/Dashboard'
-import UserProfile from './views/dashboard/pages/UserProfile'
-import Notification from './views/dashboard/component/Notifications'
-import Icons from './views/dashboard/component/Icons'
-import Typography from './views/dashboard/component/Typography'
 import ListBrand from './views/manage-brand/ListBrand'
 import ListProduct from './views/manage-product/ListProduct'
 import ProductDetail from './views/manage-product/ProductDetail'
+import ListOrder from './views/manage-order/ListOrder'
+import OrderDetail from './views/manage-order/OrderDetail'
 
 Vue.use(Router)
 
 const routes = [
   {
-    path: '/',
+    path: '/login',
     name: 'Login',
     component: Login,
   },
   {
-    path: '/index',
+    path: '/',
     name: 'Index',
     component: Index,
     children: [
@@ -29,26 +27,6 @@ const routes = [
         name: 'Dashboard',
         path: '',
         component: Dashboard,
-      },
-      {
-        name: 'User Profile',
-        path: 'pages/user',
-        component: UserProfile,
-      },
-      {
-        name: 'Notification',
-        path: 'components/notifications',
-        component: Notification,
-      },
-      {
-        name: 'Icons',
-        path: 'components/icons',
-        component: Icons,
-      },
-      {
-        name: 'Typography',
-        path: 'components/typography',
-        component: Typography,
       },
       {
         name: 'Manage Brand',
@@ -66,6 +44,17 @@ const routes = [
         component: ProductDetail,
         props: true,
       },
+      {
+        name: 'Manage Order',
+        path: 'order',
+        component: ListOrder,
+      },
+      {
+        name: 'Order Detail',
+        path: 'order/:orderId',
+        component: OrderDetail,
+        props: true,
+      },
     ],
   },
 ]
@@ -74,7 +63,8 @@ const router = new Router({ routes })
 
 router.beforeEach((to, from, next) => {
   const publicPages = ['Login']
-  const authPages = ['Index', 'Dashboard', 'User Profile', 'Notification', 'Icons', 'Typography', 'Manage Brand', 'Manage Product', 'Product Detail']
+  const authPages = ['Index', 'Dashboard',
+  'Manage Brand', 'Manage Product', 'Product Detail', 'Manage Order', 'Order Detail']
   const authRequired = !publicPages.includes(to.name)
   const user = JSON.parse(localStorage.getItem('user'))
 
@@ -86,7 +76,7 @@ router.beforeEach((to, from, next) => {
   if (user === null) {
     // chưa đăng nhập
     if (authRequired) {
-      next('/')
+      next('/login')
     } else {
       next()
     }
@@ -95,7 +85,7 @@ router.beforeEach((to, from, next) => {
     if (authPages.includes(to.name)) {
       next()
     } else {
-      next('/index')
+      next('/login')
     }
   }
 })
@@ -108,7 +98,7 @@ export default router
 //   routes: [
 //     {
 //       path: '/',
-//       component: () => import('@/views/dashboard/Index'),
+//       component: () => import('@/views/dashboard/'),
 //       children: [
 //         // Dashboard
 //         {

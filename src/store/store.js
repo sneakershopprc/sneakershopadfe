@@ -5,6 +5,7 @@ import templateStore from './modules/templateStore'
 import loginStore from './modules/loginStore'
 import brandStore from './modules/brandStore'
 import productStore from './modules/productStore'
+import orderStore from './modules/orderStore'
 
 Vue.use(Vuex)
 
@@ -14,5 +15,6 @@ export default new Vuex.Store({
     loginStore,
     brandStore,
     productStore,
+    orderStore,
   },
 })

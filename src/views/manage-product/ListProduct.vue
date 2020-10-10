@@ -84,6 +84,9 @@
         <template v-slot:item.index="{ item }">
           {{ listProducts.indexOf(item) + 1 }}
         </template>
+        <template v-slot:item.discount="{ item }">
+          {{ item.discount * 100 }}
+        </template>
       </v-data-table>
     </base-material-card>
 
@@ -128,7 +131,7 @@
         { text: 'Name', value: 'productNm' },
         { text: 'Brand', value: 'brandNm' },
         { text: 'Price', value: 'price' },
-        { text: 'Discount', value: 'discount' },
+        { text: 'Discount(%)', value: 'discount' },
         { text: 'Actions', value: 'actions', sortable: false },
       ],
       editedIndex: -1,
@@ -169,18 +172,18 @@
         this.fetchListProducts().then((status) => {
           if (status === 401 || status === 403) {
             this.logout()
-            this.$router.push('/')
+            this.$router.push('/login')
           }
           this.isLoading = false
         })
       },
 
       editItem (item) {
-        this.$router.push('/index/product/' + item.productId)
+        this.$router.push('/product/' + item.productId)
       },
 
       addNewProduct () {
-        this.$router.push('/index/product/0')
+        this.$router.push('/product/0')
       },
 
       deleteItem (item) {

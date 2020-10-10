@@ -46,7 +46,7 @@
           this.login(this.user)
             .then(result => {
               if (result) {
-                this.$router.push('/index')
+                this.$router.push('/')
               } else {
                 this.message = 'Incorrect Username or Password'
               }

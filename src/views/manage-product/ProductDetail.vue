@@ -328,6 +328,7 @@
               }
             } else if (status === 401 || status === 403) {
               this.logout()
+              this.$router.push('/login')
             } else {
               this.message = 'Get data fail'
               this.snackbarShow = true
@@ -405,6 +406,7 @@
                       this.fetchData()
                     } else if (status === 401 || status === 403) {
                       this.logout()
+                      this.$router.push('/login')
                     } else {
                       this.message = 'Update fail'
                       this.snackbarShow = true
