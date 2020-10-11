@@ -1,8 +1,8 @@
-import API_BASE from './BaseApi'
+import Helper from './BaseApi'
 
 class LoginApi {
   login (user) {
-    const url = API_BASE + '/login'
+    const url = Helper.API_BASE + '/login'
 
     var response = fetch(url, {
       method: 'POST',

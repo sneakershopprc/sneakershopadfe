@@ -1,20 +1,23 @@
-import API_BASE from './BaseApi'
+import Helper from './BaseApi'
 
 class BrandApi {
   getList () {
-    const url = API_BASE + '/brands'
+    const url = Helper.API_BASE + '/brands'
 
     var response = fetch(url, {
       method: 'GET',
       withCredentials: true,
       crossDomain: true,
+      headers: {
+        Authorization: 'Bearer ' + Helper.getToken(),
+      },
     })
 
     return response
   }
 
   updateBrand (brand) {
-    const url = API_BASE + '/brands/' + brand.brandId
+    const url = Helper.API_BASE + '/brands/' + brand.brandId
 
     return fetch(url, {
       method: 'PUT',
@@ -22,12 +25,13 @@ class BrandApi {
       body: JSON.stringify(brand),
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + Helper.getToken(),
       },
     })
   }
 
   add (brand) {
-    const url = API_BASE + '/brands'
+    const url = Helper.API_BASE + '/brands'
 
     return fetch(url, {
       method: 'POST',
@@ -35,6 +39,7 @@ class BrandApi {
       body: JSON.stringify(brand),
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + Helper.getToken(),
       },
     })
   }

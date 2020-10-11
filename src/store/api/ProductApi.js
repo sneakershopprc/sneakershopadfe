@@ -1,32 +1,38 @@
-import API_BASE from './BaseApi'
+import Helper from './BaseApi'
 
 class BrandApi {
   getList () {
-    const url = API_BASE + '/products'
+    const url = Helper.API_BASE + '/products'
 
     var response = fetch(url, {
       method: 'GET',
       withCredentials: true,
       crossDomain: true,
+      headers: {
+        Authorization: 'Bearer ' + Helper.getToken(),
+      },
     })
 
     return response
   }
 
   getById (id) {
-    const url = API_BASE + '/products/' + id
+    const url = Helper.API_BASE + '/products/' + id
 
     var response = fetch(url, {
       method: 'GET',
       withCredentials: true,
       crossDomain: true,
+      headers: {
+        Authorization: 'Bearer ' + Helper.getToken(),
+      },
     })
 
     return response
   }
 
   updateDetail (detail) {
-    const url = API_BASE + '/productdetails/' + detail.id
+    const url = Helper.API_BASE + '/productdetails/' + detail.id
 
     return fetch(url, {
       method: 'PUT',
@@ -35,12 +41,13 @@ class BrandApi {
       body: JSON.stringify(detail),
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + Helper.getToken(),
       },
     })
   }
 
   addNewDetail (detail) {
-    const url = API_BASE + '/productdetails'
+    const url = Helper.API_BASE + '/productdetails'
 
     return fetch(url, {
       method: 'POST',
@@ -49,12 +56,13 @@ class BrandApi {
       body: JSON.stringify(detail),
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + Helper.getToken(),
       },
     })
   }
 
   updateProduct (product) {
-    const url = API_BASE + '/products/' + product.productId
+    const url = Helper.API_BASE + '/products/' + product.productId
 
     return fetch(url, {
       method: 'PUT',
@@ -63,12 +71,13 @@ class BrandApi {
       body: JSON.stringify(product),
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + Helper.getToken(),
       },
     })
   }
 
   insertProduct (product) {
-    const url = API_BASE + '/products'
+    const url = Helper.API_BASE + '/products'
 
     return fetch(url, {
       method: 'POST',
@@ -77,17 +86,21 @@ class BrandApi {
       body: JSON.stringify(product),
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + Helper.getToken(),
       },
     })
   }
 
   deleteProduct (id) {
-    const url = API_BASE + '/products/' + id
+    const url = Helper.API_BASE + '/products/' + id
 
     return fetch(url, {
       method: 'DELETE',
       withCredentials: true,
       crossDomain: true,
+      headers: {
+        Authorization: 'Bearer ' + Helper.getToken(),
+      },
     })
   }
 }

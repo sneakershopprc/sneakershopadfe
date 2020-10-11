@@ -1,28 +1,34 @@
-import API_BASE from './BaseApi'
+import Helper from './BaseApi'
 
 class OrderApi {
   getList () {
-    const url = API_BASE + '/orders'
+    const url = Helper.API_BASE + '/orders'
 
     return fetch(url, {
       method: 'GET',
       withCredentials: true,
       crossDomain: true,
+      headers: {
+        Authorization: 'Bearer ' + Helper.getToken(),
+      },
     })
   }
 
   getDetail (orderId) {
-    const url = API_BASE + '/orders/' + orderId
+    const url = Helper.API_BASE + '/orders/' + orderId
 
     return fetch(url, {
       method: 'GET',
       withCredentials: true,
       crossDomain: true,
+      headers: {
+        Authorization: 'Bearer ' + Helper.getToken(),
+      },
     })
   }
 
   updateStatus (orderId, status) {
-    const url = API_BASE + '/orders/' + orderId
+    const url = Helper.API_BASE + '/orders/' + orderId
 
     var stt = { status: status }
 
@@ -33,6 +39,7 @@ class OrderApi {
       body: JSON.stringify(stt),
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + Helper.getToken(),
       },
     })
   }
