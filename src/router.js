@@ -10,6 +10,7 @@ import ProductDetail from './views/manage-product/ProductDetail'
 import ListOrder from './views/manage-order/ListOrder'
 import OrderDetail from './views/manage-order/OrderDetail'
 import Profile from './views/Profile'
+import ListUser from './views/manage-user/ListUser'
 
 Vue.use(Router)
 
@@ -33,6 +34,11 @@ const routes = [
         name: 'Profile',
         path: 'profile',
         component: Profile,
+      },
+      {
+        name: 'Manage User',
+        path: 'user',
+        component: ListUser,
       },
       {
         name: 'Manage Brand',
@@ -69,7 +75,7 @@ const router = new Router({ routes })
 
 router.beforeEach((to, from, next) => {
   const publicPages = ['Login']
-  const authPages = ['Index', 'Dashboard', 'Profile',
+  const authPages = ['Index', 'Dashboard', 'Profile', 'Manage User',
   'Manage Brand', 'Manage Product', 'Product Detail', 'Manage Order', 'Order Detail']
   const authRequired = !publicPages.includes(to.name)
   const user = JSON.parse(localStorage.getItem('user'))

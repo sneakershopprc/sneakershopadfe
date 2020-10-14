@@ -9,10 +9,23 @@
       title="Manage Product"
       class="px-5 py-3"
     >
+      <v-card-title>
+        <v-spacer />
+        <v-text-field
+          v-model="search"
+          append-icon="mdi-magnify"
+          label="Search product name..."
+          single-line
+          hide-details
+        />
+      </v-card-title>
+
       <v-data-table
         :headers="headers"
         :items="listProducts"
         :loading="isLoading"
+        :search="search"
+        :custom-filter="searchProductName"
         class="elevation-1"
       >
         <template v-slot:top>
@@ -139,6 +152,7 @@
       imgTmp: '',
       snackbarShow: false,
       message: '',
+      search: '',
     }),
 
     computed: {
@@ -236,6 +250,11 @@
       cancelImg () {
         this.editedBrand.photo = this.imgTmp
         this.isUploading = false
+      },
+
+      searchProductName (value, search, items) {
+        if (items.productNm) return items.productNm.toLowerCase().includes(search)
+        return false
       },
     },
   }

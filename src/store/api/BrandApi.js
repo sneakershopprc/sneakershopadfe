@@ -43,6 +43,19 @@ class BrandApi {
       },
     })
   }
+
+  delete (brandId) {
+    const url = Helper.API_BASE + '/brands/' + brandId
+
+    return fetch(url, {
+      method: 'DELETE',
+      withCredentials: true,
+      crossDomain: true,
+      headers: {
+        Authorization: 'Bearer ' + Helper.getToken(),
+      },
+    })
+  }
 }
 
 export default new BrandApi()

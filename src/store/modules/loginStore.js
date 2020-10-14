@@ -10,7 +10,8 @@ export default {
   },
   getters: {
     getUser (state) {
-      return JSON.parse(localStorage.getItem('user'))
+      state.user = JSON.parse(localStorage.getItem('user'))
+      return state.user
     },
   },
   mutations: {

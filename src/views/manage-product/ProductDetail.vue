@@ -353,7 +353,7 @@
           this.isLoading = true
           var fileName = moment() + this.imageFile.name
 
-          const storageRef = firebase.storage().ref(`${fileName}`).put(this.imageFile)
+          const storageRef = firebase.storage().ref().child('product/' + this.productId + '/' + fileName).put(this.imageFile)
 
           storageRef.on('state_changed', snapshot => {
                           this.uploadValue = (snapshot.bytesTransferred / snapshot.totalBytes) * 100

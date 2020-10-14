@@ -9,10 +9,23 @@
       title="Manage Order"
       class="px-5 py-3"
     >
+      <v-card-title>
+        <v-spacer />
+        <v-text-field
+          v-model="search"
+          append-icon="mdi-magnify"
+          label="Search phone..."
+          single-line
+          hide-details
+        />
+      </v-card-title>
+
       <v-data-table
         :headers="headers"
         :items="listOrders"
         :loading="isLoading"
+        :search="search"
+        :custom-filter="searchPhone"
         class="elevation-1"
       >
         <template v-slot:top>
@@ -82,6 +95,7 @@
   export default {
     data: () => ({
       isLoading: false,
+      search: '',
       headers: [
         { text: 'No.', value: 'index' },
         { text: 'Fullname', value: 'receiverNm' },
@@ -129,6 +143,11 @@
 
       viewDetail (id) {
         this.$router.push('/order/' + id)
+      },
+
+      searchPhone (value, search, items) {
+        if (items.phonenumber) return items.phonenumber.includes(search)
+        return false
       },
     },
   }

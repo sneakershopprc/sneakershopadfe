@@ -26,10 +26,11 @@
               <v-row>
                 <v-col
                   cols="12"
-                  md="4"
+                  md="6"
                 >
                   <v-text-field
-                    label="Company (disabled)"
+                    label="Username"
+                    :value="user.username"
                     disabled
                   />
                 </v-col>
@@ -40,16 +41,19 @@
                 >
                   <v-text-field
                     class="purple-input"
-                    label="User Name"
+                    label="Role"
+                    :value="user.role"
+                    disabled
                   />
                 </v-col>
 
                 <v-col
                   cols="12"
-                  md="4"
+                  md="6"
                 >
                   <v-text-field
-                    label="Email Address"
+                    v-model="user.fullname"
+                    label="Fullname"
                     class="purple-input"
                   />
                 </v-col>
@@ -59,65 +63,35 @@
                   md="6"
                 >
                   <v-text-field
-                    label="First Name"
+                    v-model="user.email"
+                    label="Email"
                     class="purple-input"
+                  />
+                </v-col>
+
+                <v-col cols="6">
+                  <v-file-input
+                    v-model="imageFile"
+                    :rules="rules"
+                    accept="image/*"
+                    placeholder="Pick an avatar"
+                    prepend-icon="mdi-camera"
+                    label="Avatar"
+                    @change="uploadImg"
+                    @click:clear="cancelImg"
                   />
                 </v-col>
 
                 <v-col
-                  cols="12"
-                  md="6"
+                  cols="6"
+                  class="text-center"
                 >
-                  <v-text-field
-                    label="Last Name"
-                    class="purple-input"
-                  />
-                </v-col>
-
-                <v-col cols="12">
-                  <v-text-field
-                    label="Adress"
-                    class="purple-input"
-                  />
-                </v-col>
-
-                <v-col
-                  cols="12"
-                  md="4"
-                >
-                  <v-text-field
-                    label="City"
-                    class="purple-input"
-                  />
-                </v-col>
-
-                <v-col
-                  cols="12"
-                  md="4"
-                >
-                  <v-text-field
-                    label="Country"
-                    class="purple-input"
-                  />
-                </v-col>
-
-                <v-col
-                  cols="12"
-                  md="4"
-                >
-                  <v-text-field
-                    class="purple-input"
-                    label="Postal Code"
-                    type="number"
-                  />
-                </v-col>
-
-                <v-col cols="12">
-                  <v-textarea
-                    class="purple-input"
-                    label="About Me"
-                    value="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-                  />
+                  <img
+                    v-if="previewAvatarUrl != null"
+                    style="margin: 15px 0"
+                    height="100"
+                    :src="previewAvatarUrl"
+                  >
                 </v-col>
 
                 <v-col
@@ -127,6 +101,8 @@
                   <v-btn
                     color="success"
                     class="mr-0"
+                    :disabled="isLoading"
+                    @click="update"
                   >
                     Update Profile
                   </v-btn>
@@ -143,36 +119,59 @@
       >
         <base-material-card
           class="v-card-profile"
-          avatar="https://demos.creative-tim.com/vue-material-dashboard/img/marc.aba54d65.jpg"
+          :avatar="tmpUser.photo"
         >
           <v-card-text class="text-center">
             <h6 class="display-1 mb-1 grey--text">
-              CEO / CO-FOUNDER
+              {{ tmpUser.role }}
             </h6>
 
             <h4 class="display-2 font-weight-light mb-3 black--text">
-              Alec Thompson
+              {{ tmpUser.fullname }}
             </h4>
-
-            <p class="font-weight-light grey--text">
-              Don't be scared of the truth because we need to restart the human foundation in truth And I love you like Kanye loves Kanye I love Rick Owens’ bed design but the back is...
-            </p>
           </v-card-text>
         </base-material-card>
       </v-col>
     </v-row>
+    <v-snackbar
+      v-model="snackbarShow"
+      :timeout="5000"
+    >
+      {{ message }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn
+          color="pink"
+          text
+          v-bind="attrs"
+          @click="snackbarShow = false"
+        >
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-container>
 </template>
 
 <script>
   import { mapActions, mapState } from 'vuex'
+  import firebase from 'firebase'
+  import moment from 'moment'
 
   export default {
     name: 'Profile',
     data () {
       return {
         profile: {},
+        tmpUser: {},
         isLoading: false,
+        imageFile: null,
+        previewAvatarUrl: null,
+        snackbarShow: false,
+        message: '',
+        rules: [
+          value => !value || value.size < 20000000 || 'Image size should be less than 20 MB!',
+        ],
       }
     },
     computed: {
@@ -182,7 +181,8 @@
       this.initialize()
     },
     methods: {
-      ...mapActions('accountStore', ['fetchProfile']),
+      ...mapActions('accountStore', ['fetchProfile', 'updateProfile']),
+      ...mapActions('loginStore', ['logout']),
 
       initialize () {
         this.isLoading = true
@@ -193,7 +193,67 @@
             this.$router.push('/login')
           }
           this.isLoading = false
+          this.setTmpUserVal()
         })
+      },
+
+      setTmpUserVal () {
+        this.tmpUser = {
+          fullname: this.user.fullname,
+          username: this.user.username,
+          photo: this.user.photo,
+          role: this.user.role,
+        }
+      },
+
+      uploadImg () {
+        if (this.imageFile) {
+          this.isLoading = true
+          var fileName = moment() + this.imageFile.name
+
+          const storageRef = firebase.storage().ref().child('profile/' + fileName).put(this.imageFile)
+
+          storageRef.on('state_changed', snapshot => {
+                          this.uploadValue = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+                        },
+                        error => {
+                          console.log(error.message)
+                          this.isLoading = false
+                        },
+                        () => {
+                          this.uploadValue = 100
+                          storageRef.snapshot.ref.getDownloadURL().then((url) => {
+                            this.previewAvatarUrl = url
+                            this.user.photo = this.previewAvatarUrl
+                            console.log(this.previewAvatarUrl)
+                            this.isLoading = false
+                          })
+                        },
+          )
+        }
+      },
+
+      cancelImg () {
+        this.previewAvatarUrl = null
+        this.user.photo = null
+        this.isLoading = false
+      },
+
+      update () {
+        if (!this.isLoading) {
+          this.isLoading = true
+          this.updateProfile().then(status => {
+            if (status === 401 || status === 403) {
+              this.logout()
+              this.$router.push('/login')
+            } else if (status === 200) {
+              this.setTmpUserVal()
+              this.snackbarShow = true
+              this.message = 'Profile update successfully'
+            }
+            this.isLoading = false
+          })
+        }
       },
     },
   }

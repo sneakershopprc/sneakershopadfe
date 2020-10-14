@@ -9,10 +9,23 @@
       title="Manage Brand"
       class="px-5 py-3"
     >
+      <v-card-title>
+        <v-spacer />
+        <v-text-field
+          v-model="search"
+          append-icon="mdi-magnify"
+          label="Search brand name..."
+          single-line
+          hide-details
+        />
+      </v-card-title>
+
       <v-data-table
         :headers="headers"
         :items="listBrands"
         :loading="isLoading"
+        :search="search"
+        :custom-filter="searchBrandName"
         class="elevation-1"
       >
         <template v-slot:top>
@@ -191,6 +204,7 @@
       rules: [
         value => !value || value.size < 20000000 || 'Image size should be less than 20 MB!',
       ],
+      search: '',
       imagePreview: null,
       isLoading: false,
       isDialogLoaing: false,
@@ -243,7 +257,7 @@
     },
 
     methods: {
-      ...mapActions('brandStore', ['fetchListBrands', 'updateBrand', 'addBrand']),
+      ...mapActions('brandStore', ['fetchListBrands', 'updateBrand', 'addBrand', 'deleteBrand']),
       ...mapActions('loginStore', ['logout']),
       ...mapMutations('brandStore', ['setBrand']),
 
@@ -274,8 +288,23 @@
       },
 
       deleteItemConfirm () {
-        this.listBrands.splice(this.editedIndex, 1)
+        this.isLoading = true
         this.closeDelete()
+        this.deleteBrand(this.editedBrand.brandId)
+          .then(status => {
+            if (status === 401 || status === 403) {
+              this.logout()
+              this.$router.push('/login')
+            } else if (status === 204) {
+              this.isLoading = false
+              this.snackbarShow = true
+              this.message = 'Delete brand successfully'
+              this.listBrands.splice(this.editedIndex, 1)
+            } else {
+              this.snackbarShow = true
+              this.message = 'Delete brand failed'
+            }
+          })
       },
 
       close () {
@@ -348,7 +377,7 @@
           var extend = this.imagePreview.name.substr(this.imagePreview.name.lastIndexOf('.'))
           var fileName = this.editedBrand.brandId + extend
 
-          const storageRef = firebase.storage().ref(`${fileName}`).put(this.imagePreview)
+          const storageRef = firebase.storage().ref().child('brand/' + fileName).put(this.imagePreview)
 
           storageRef.on('state_changed', snapshot => {
                           this.uploadValue = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
@@ -372,6 +401,11 @@
       cancelImg () {
         this.editedBrand.photo = this.imgTmp
         this.isUploading = false
+      },
+
+      searchBrandName (value, search, items) {
+        if (items.brandNm) return items.brandNm.toLowerCase().includes(search)
+        return false
       },
     },
   }

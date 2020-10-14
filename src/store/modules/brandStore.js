@@ -55,6 +55,11 @@ export default {
           return response.status
         })
     },
+
+    deleteBrand (context, brandId) {
+      return BrandApi.delete(brandId)
+        .then(response => response.status)
+    },
   },
   namespaced: true,
 }

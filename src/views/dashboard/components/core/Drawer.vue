@@ -31,7 +31,7 @@
           contain
         >
           <v-img
-            src="https://demos.creative-tim.com/vuetify-material-dashboard/favicon.ico"
+            :src="getUser.photo"
             max-height="30"
           />
         </v-list-item-avatar>
@@ -112,6 +112,11 @@
           icon: 'mdi-view-dashboard',
           title: 'dashboard',
           to: '/',
+        },
+        {
+          title: 'Manage User',
+          icon: 'mdi-clipboard-outline',
+          to: '/user',
         },
         {
           title: 'Manage Brand',
