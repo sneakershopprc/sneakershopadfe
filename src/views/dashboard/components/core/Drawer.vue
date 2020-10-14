@@ -24,7 +24,7 @@
       dense
       nav
     >
-      <v-list-item>
+      <v-list-item @click="viewProfile()">
         <v-list-item-avatar
           class="align-self-center"
           color="white"
@@ -39,7 +39,7 @@
         <v-list-item-content>
           <v-list-item-title
             class="display-1"
-            v-text="profile.title"
+            v-text="getUser.fullname"
           />
         </v-list-item-content>
       </v-list-item>
@@ -93,6 +93,7 @@
   import {
     mapState,
     mapMutations,
+    mapGetters,
   } from 'vuex'
 
   export default {
@@ -128,14 +129,15 @@
           to: '/order',
         },
       ],
-      ...mapState('templateStore', ['drawer']),
+      ...mapState('templateStore', ['_drawer']),
     }),
 
     computed: {
+      ...mapGetters('loginStore', ['getUser']),
       ...mapState('templateStore', ['barColor', 'barImage']),
       drawer: {
         get () {
-          return this.drawer
+          return this._drawer
         },
         set (val) {
           this.setDrawer(val)
@@ -161,6 +163,11 @@
           children: item.children ? item.children.map(this.mapItem) : undefined,
           title: this.$t(item.title),
         }
+      },
+
+      viewProfile () {
+        console.log('click profile')
+        this.$router.push('/profile')
       },
     },
   }

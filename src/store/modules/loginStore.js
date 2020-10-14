@@ -8,6 +8,11 @@ export default {
   state: {
     user: {},
   },
+  getters: {
+    getUser (state) {
+      return JSON.parse(localStorage.getItem('user'))
+    },
+  },
   mutations: {
     setUser (state, user) {
       if (user === null) {
