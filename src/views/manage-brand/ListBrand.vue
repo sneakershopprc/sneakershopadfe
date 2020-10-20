@@ -382,8 +382,7 @@
           storageRef.on('state_changed', snapshot => {
                           this.uploadValue = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
                         },
-                        error => {
-                          // console.log(error.message)
+                        () => {
                           this.isUploading = false
                         },
                         () => {
