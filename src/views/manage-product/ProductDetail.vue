@@ -307,7 +307,7 @@
 
       fetchData () {
         this.isLoading = true
-        console.log('proID ', this.productId)
+        // console.log('proID ', this.productId)
         this.fetchListBrands()
           .then(status => {
             if (status === 200) {
@@ -359,7 +359,7 @@
                           this.uploadValue = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
                         },
                         error => {
-                          console.log(error.message)
+                          // console.log(error.message)
                           this.message = 'Upload image failed'
                           this.snackbarShow = true
                           this.isLoading = false
@@ -392,7 +392,7 @@
       },
 
       action () {
-        console.log('actionnn', this.$refs.form.validate())
+        // console.log('actionnn', this.$refs.form.validate())
         if (this.$refs.form.validate() && this.validateForm()) {
           this.isLoading = true
           if (this.productId !== '0') {
@@ -419,7 +419,7 @@
               .then(status => {
                 if (status === 201) {
                   this.productId = this.product.productId
-                  console.log('idddd ', this.productId)
+                  // console.log('idddd ', this.productId)
                   this.insertDetail()
                     .then(() => {
                       this.isLoading = false

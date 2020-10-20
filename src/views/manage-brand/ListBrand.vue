@@ -383,14 +383,14 @@
                           this.uploadValue = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
                         },
                         error => {
-                          console.log(error.message)
+                          // console.log(error.message)
                           this.isUploading = false
                         },
                         () => {
                           this.uploadValue = 100
                           storageRef.snapshot.ref.getDownloadURL().then((url) => {
                             this.editedBrand.photo = url
-                            console.log(this.editedBrand.photo)
+                            // console.log(this.editedBrand.photo)
                             this.isUploading = false
                           })
                         },

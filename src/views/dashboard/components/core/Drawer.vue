@@ -171,7 +171,7 @@
       },
 
       viewProfile () {
-        console.log('click profile')
+        // console.log('click profile')
         this.$router.push('/profile')
       },
     },

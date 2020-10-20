@@ -257,7 +257,7 @@
 
       fetchData () {
         this.isLoading = true
-        console.log('order id ', this.orderId)
+        // console.log('order id ', this.orderId)
         this.fetchDetail(this.orderId).then((status) => {
           if (status === 200) {
             this.isLoading = false

@@ -80,8 +80,8 @@ router.beforeEach((to, from, next) => {
   const authRequired = !publicPages.includes(to.name)
   const user = JSON.parse(localStorage.getItem('user'))
 
-  console.log('router name ', to.name)
-  console.log('this.user', user)
+  // console.log('router name ', to.name)
+  // console.log('this.user', user)
 
   // trying to access a restricted page + not logged in
   // redirect to login page

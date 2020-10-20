@@ -34,7 +34,7 @@ export default {
           if (response.status === 200) {
             response.json()
               .then(data => {
-                console.log('dataaaa ', data)
+                // console.log('dataaaa ', data)
                 context.commit('setListBrand', data.data)
               })
           }

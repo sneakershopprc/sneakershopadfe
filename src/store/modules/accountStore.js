@@ -26,7 +26,7 @@ export default {
           if (status === 200) {
             return response.json()
               .then(data => {
-                console.log('profile ', data)
+                // console.log('profile ', data)
                 context.commit('setUser', data)
                 return status
               })
@@ -41,7 +41,7 @@ export default {
           if (status === 200) {
             return response.json()
               .then(data => {
-                console.log('profile ', data)
+                // console.log('profile ', data)
                 context.commit('setUser', data)
 
                 var curStoreUser = localStorage.getItem('user')
@@ -66,7 +66,7 @@ export default {
           if (response.status === 200) {
             return response.json()
               .then(data => {
-                console.log('list acc', data)
+                // console.log('list acc', data)
                 context.commit('setListAcc', data)
 
                 return response.status
@@ -80,7 +80,7 @@ export default {
         .then(response => {
           if (response.status === 200) {
             var current = context.state.listAcc.find(e => e.username === username)
-            console.log('acc ', current)
+            // console.log('acc ', current)
             current.delFlg = !current.delFlg
           }
           return response.status

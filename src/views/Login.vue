@@ -41,7 +41,7 @@
       ...mapActions('loginStore', ['login']),
       // login
       doLogin () {
-        console.log(this.user)
+        // console.log(this.user)
         if (this.user.username.length > 0 && this.user.password.length > 0) {
           this.login(this.user)
             .then(result => {

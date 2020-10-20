@@ -39,7 +39,7 @@ export default {
           if (response.status === 200) {
             response.json()
               .then(data => {
-                console.log('dataaaa ', data.data)
+                // console.log('dataaaa ', data.data)
                 context.commit('setListOrders', data.data)
               })
           }
@@ -52,7 +52,7 @@ export default {
           if (response.status === 200) {
             response.json()
               .then(data => {
-                console.log('dataaaa ', data)
+                // console.log('dataaaa ', data)
 
                 var listProduct = []
                 var total = 0
@@ -82,7 +82,7 @@ export default {
         })
     },
     updateStatus (context, { status, orderId }) {
-      console.log(status)
+      // console.log(status)
       return OrderApi.updateStatus(orderId, status)
         .then(response => {
           if (response.status === 200) {

@@ -29,7 +29,7 @@ export default {
     login (context, user) {
       return LoginApi.login(user)
       .then(response => {
-        console.log(response)
+        // console.log(response)
         if (response.status === 200) {
           return response.json()
         } else {

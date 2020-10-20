@@ -57,7 +57,7 @@ export default {
           if (response.status === 200) {
             response.json()
               .then(data => {
-                console.log('dataaaa ', data.data)
+                // console.log('dataaaa ', data.data)
                 context.commit('setListProduct', data.data)
               })
           }
@@ -71,7 +71,7 @@ export default {
           if (response.status === 200) {
             response.json()
               .then(data => {
-                console.log('producttttt ', data)
+                // console.log('producttttt ', data)
                 if (data.discount) {
                   data.discount = data.discount * 100
                 }
@@ -84,7 +84,7 @@ export default {
                   })
 
                   context.commit('setListPhoto', tmpLst)
-                  console.log('listphotooo ', context.state.listPhoto)
+                  // console.log('listphotooo ', context.state.listPhoto)
                 }
 
                 if (data.productDetailList) {
@@ -106,7 +106,7 @@ export default {
     updateDetail (context) {
       for (let i = 0; i < context.state.listDetail.length; i++) {
         var detail = context.state.listDetail[i]
-        console.log('detaillllllll ', detail)
+        // console.log('detaillllllll ', detail)
         if (detail.origin) {
           var current = context.state.product.productDetailList.find(e => e.id === detail.id)
 
@@ -141,7 +141,7 @@ export default {
     insertDetail (context) {
       for (let i = 0; i < context.state.listDetail.length; i++) {
         var detail = context.state.listDetail[i]
-        console.log('detaillllllll ', detail)
+        // console.log('detaillllllll ', detail)
         if (detail.quantity !== 0 && detail.size !== 0 && detail.price !== 0) {
           detail.productId = context.state.product.productId
           ProductApi.addNewDetail(detail)
@@ -164,7 +164,7 @@ export default {
             return response.json()
               .then(data => {
                 context.state.product.productId = data.productId
-                console.log('productId ', context.state.product.productId)
+                // console.log('productId ', context.state.product.productId)
               }).then(() => response.status)
           }
           return response.status
