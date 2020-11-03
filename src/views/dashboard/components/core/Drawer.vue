@@ -109,11 +109,6 @@
     data: () => ({
       items: [
         {
-          icon: 'mdi-view-dashboard',
-          title: 'dashboard',
-          to: '/',
-        },
-        {
           title: 'Manage User',
           icon: 'mdi-clipboard-outline',
           to: '/user',

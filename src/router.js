@@ -3,7 +3,6 @@ import Router from 'vue-router'
 
 import Login from './views/Login.vue'
 import Index from './views/dashboard/Index'
-import Dashboard from './views/dashboard/Dashboard'
 import ListBrand from './views/manage-brand/ListBrand'
 import ListProduct from './views/manage-product/ListProduct'
 import ProductDetail from './views/manage-product/ProductDetail'
@@ -28,7 +27,7 @@ const routes = [
       {
         name: 'Dashboard',
         path: '',
-        component: Dashboard,
+        component: ListOrder,
       },
       {
         name: 'Profile',
@@ -97,7 +96,7 @@ router.beforeEach((to, from, next) => {
     if (authPages.includes(to.name)) {
       next()
     } else {
-      next('/login')
+      next('/')
     }
   }
 })

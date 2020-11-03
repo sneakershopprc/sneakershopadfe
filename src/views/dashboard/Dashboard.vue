@@ -1,5 +1,7 @@
 <template>
-  <div>Dashboard</div>
+  <div style="min-height: 100%">
+    Dashboard
+  </div>
 </template>
 
 <script>
