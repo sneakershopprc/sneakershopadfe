@@ -33,6 +33,9 @@
             <v-spacer />
           </v-toolbar>
         </template>
+        <template v-slot:item.insDatetime="{ item }">
+          {{ item.insDatetime | formatDatetime }}
+        </template>
         <template v-slot:item.status="{ item }">
           <v-chip
             v-if="item.status === 'Cancel'"
@@ -91,8 +94,16 @@
 
 <script>
   import { mapActions, mapGetters } from 'vuex'
+  import moment from 'moment'
 
   export default {
+
+    filters: {
+      formatDatetime (value) {
+        if (!value) return ''
+        return moment(value).add(7, 'hours').format('DD/MM/YYYY, HH:mm')
+      },
+    },
     data: () => ({
       isLoading: false,
       search: '',
