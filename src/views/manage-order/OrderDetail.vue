@@ -81,11 +81,11 @@
                   :loading="isLoading"
                   class="elevation-1"
                 >
-                  <template v-slot:item.photo="{ item }">
+                  <template v-slot:item.Photo="{ item }">
                     <img
                       style="margin: 15px 0"
                       height="100"
-                      :src="item.photoList ? item.photoList[0] : ''"
+                      :src="item.Photo ? item.Photo : ''"
                     >
                   </template>
                   <template v-slot:item.index="{ item }">
@@ -234,7 +234,7 @@
         orderId: '',
         headers: [
           { text: 'No.', value: 'index' },
-          { text: 'Image', value: 'photo' },
+          { text: 'Image', value: 'Photo' },
           { text: 'Name', value: 'ProductNm' },
           { text: 'Color', value: 'Color' },
           { text: 'Price', value: 'Price' },

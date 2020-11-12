@@ -252,7 +252,7 @@
       },
 
       searchProductName (value, search, items) {
-        if (items.productNm) return items.productNm.toLowerCase().includes(search)
+        if (items.productNm) return items.productNm.toLowerCase().includes(search.toLowerCase())
         return false
       },
     },
