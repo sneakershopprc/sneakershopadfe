@@ -32,7 +32,6 @@
         >
           <v-img
             :src="getUser.photo"
-            max-height="30"
           />
         </v-list-item-avatar>
 
@@ -110,22 +109,22 @@
       items: [
         {
           title: 'Manage User',
-          icon: 'mdi-clipboard-outline',
+          icon: 'mdi-account-box',
           to: '/user',
         },
         {
           title: 'Manage Brand',
-          icon: 'mdi-clipboard-outline',
+          icon: 'mdi-book-account',
           to: '/brand',
         },
         {
           title: 'Manage Product',
-          icon: 'mdi-map-marker',
+          icon: 'mdi-shoe-sneaker',
           to: '/product',
         },
         {
           title: 'Manage Order',
-          icon: 'mdi-format-font',
+          icon: 'mdi-storefront',
           to: '/order',
         },
       ],
